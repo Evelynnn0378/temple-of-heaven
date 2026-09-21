@@ -12,3 +12,31 @@ html{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;font-family:sans-se
 .map-w_pin .text-dark{color:#2B2320}
 .map-w_pin .map-pin_ico,.map-w_pin .map-pin_vector{color:#2B2320}
 .map-w_pin .text-gray{color:#2B23208C}
+/* Round3 P1：.sound-w 固定声音开关叠印修复。
+   根因：fixed 左下(inset:auto auto 0% 0%)，桌面 y≈20200 与 sights tabs 末项重叠 80×32px；移动端叠新闻卡标题/轮播分页器/正文。
+   处理：全断点挪至右下安全区(左侧为 sights tabs 常驻侧栏/分页器/版权密集区，右下实测无常驻 UI)。已排除 header 下方方案：sights 左侧 tabs 侧栏通高，top-left 必压 tab 项。
+   JS 无冲突证据：main.js 对 .sound-w 仅 gsap.from yPercent:125(transform)+gsap.set visibility(一次入场)；initSoundToggle 只切
+   [data-sound] 子项 class 与子元素 tween；initThemeChange 只 add/remove theme class；全文件无对 .sound-w 的
+   top/left/right/bottom/inset/width/height 读写(inset 关键字仅出现于 clipPath 与其他元素)。动画目标值未动。 */
+.sound-w{inset:auto 0% 0% auto}
+/* Round3 P2："5,900 M²" sup"2"上探与数字相交修复。
+   处理：仅 .apartments-card_info_area 作用域内把 --_fonts---h2--line-height 91.667%→100%，全局 h2 变量不动。
+   JS 无冲突证据：main.js 中 apartments-card_info 0 命中、--_fonts/lineHeight/line-height 0 命中，无 JS 读写该变量或行高。 */
+.apartments-card_info_area .h2{--_fonts---h2--line-height:100%}
+/* Round3 P3：移动端 footer 邮箱左溢出 8px 被裁修复(mailto 实测 x=-8、宽388@390 视口)。
+   处理：≤479px 作用域限宽 max-width:100% + 字号收窄至 p2×0.82、字距 0.04em；桌面规则不动。
+   JS 无冲突证据：main.js 中 contact-cms/mailto 0 命中；[hover-nav-item] 悬停动画仅 tween chars 的 opacity/yPercent/scale，
+   且包在 min-width 桌面 matchMedia 内，不读写 font-size/letter-spacing/max-width。 */
+@media screen and (max-width:479px){
+.contact-cms_list_item .nav-item{max-width:100%}
+.contact-cms_list_item .nav-item_label_text{font-size:calc(var(--_fonts---p2--size)*.82);letter-spacing:.04em}
+}
+/* Round3 P4：地图 pin 文字与 map.svg 烘焙标注相穿修复。
+   处理：pin 文字加宣纸 80% 底衬 pill(#F2EAD9@80% + 圆角2px + u-4/u-8 padding)；.map-w_pin.is-N 的 inset 定位点一律不动。
+   JS 无冲突证据：initMapPins 仅桌面 matchMedia 下对 [pin] 容器 gsap.to scale(transform，鼠标跟随放大)，
+   不读写 background/padding/border-radius；底衬只加在 .pin 文字元素上，非 [pin] 容器，scale 作用于容器不受影响。 */
+.map-w_pin .pin{background-color:rgba(242,234,217,.8);padding:var(--_units---u-4) var(--_units---u-8);border-radius:2px}
+/* Round3 P5：strong/b faux-bold 修复(KTF Metro 仅 @font-face 400 一档，700 触发浏览器合成加粗发虚)。
+   处理：font-weight 400 化 + 字距 0.04em 强调(不用颜色，避免深浅底对比度风险)。
+   JS 无冲突证据：main.js 无 font-weight/letter-spacing 读写，纯文字渲染属性，非 JS 动画属性。 */
+b,strong{font-weight:400;letter-spacing:.04em}
